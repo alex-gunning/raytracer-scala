@@ -1,6 +1,8 @@
 import scala.util.control.Breaks.{break, breakable}
 
 case class Matrix(data: Array[Array[Float]]) {
+  val w: Int = data(0).length
+  val h: Int = data.length
   def apply(i: Int, j: Int): Float = data(i)(j) // Indexing
   def update(i: Int, j: Int, value: Float) = { // Assignment
     data(i)(j) = value
@@ -54,9 +56,18 @@ case class Matrix(data: Array[Array[Float]]) {
       var newMatrix = Matrix(
         Array.fill(data.length)(Array.fill(other.data(0).length)(0f))
       )
-      for(i <- newMatrix.data.indices) {
-        for(j <- newMatrix.data(0).indices) {
-          newMatrix = newMatrix(i, j) = 1// TODO: Multiply our row i by their column j
+      val newW = newMatrix.w
+
+      for(x <- newMatrix.data(0).indices) {
+        for(y <- newMatrix.data.indices) {
+          var sum = 0f
+          // Full width x height
+          for(n <- Range.inclusive(0, newW - 1)) {
+            val cellX = data(x)(n)
+            val cellY = other.data(n)(y)
+            sum += cellX * cellY
+          }
+          newMatrix(x, y) = sum
         }
       }
       newMatrix

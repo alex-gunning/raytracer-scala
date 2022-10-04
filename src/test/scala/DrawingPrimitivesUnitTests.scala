@@ -194,5 +194,28 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
     val matrix = m1(1,1) = 3f
     assert(matrix == expected)
   }
+
+  test("Matrix multiplication") {
+    val m1 = Matrix(Array(
+      Array(1f , 2f , 3f , 4f ),
+      Array(5f , 6f , 7f , 8f ),
+      Array(9f , 8f , 7f , 6f ),
+      Array(5f , 4f , 3f , 2f ),
+    ))
+    val m2 = Matrix(Array(
+      Array(-2f   , 1f  , 2f  , 3f ),
+      Array(3f    , 2f  , 1f  , -1f),
+      Array(4f    , 3f  , 6f  , 5f ),
+      Array(1f    , 2f  , 7f  , 8f ),
+    ))
+    val expected = Matrix(Array(
+      Array(20, 22, 50, 48),
+      Array(44, 54, 114, 108),
+      Array(40, 58, 110, 102),
+      Array(16, 26, 46, 42),
+    ))
+    val matrix = m1 * m2
+    assert(matrix == expected)
+  }
 }
 
