@@ -68,6 +68,13 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
     assert(result == 20)
   }
 
+  test("Cross product of (1,2,3), (2,3,4)") {
+    val vecA = Vector(1, 2, 3)
+    val vecB = Vector(2, 3, 4)
+    assert(vecA.cross(vecB) == Vector(-1, 2, -1))
+    assert(vecB.cross(vecA) == Vector(1, -2, 1))
+  }
+
   test("Colour data is stored") {
     val c = Colour(1.0F, -0.5F, 0.7F)
     assert(c.r == 1.0F)
@@ -216,6 +223,85 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
     ))
     val matrix = m1 * m2
     assert(matrix == expected)
+  }
+  test("Different size matrix multiplication") {
+    val m1 = Matrix(Array(
+      Array(1f , 2f , 3f , 4f ),
+      Array(5f , 6f , 7f , 8f ),
+      Array(9f , 8f , 7f , 6f ),
+      Array(5f , 4f , 3f , 2f ),
+    ))
+    val m2 = Matrix(Array(
+      Array(1f),
+      Array(2f),
+      Array(1f),
+      Array(1f),
+    ))
+    val expected = Matrix(Array(
+      Array(12f),
+      Array(32f),
+      Array(38f),
+      Array(18f),
+    ))
+    val matrix = m1 * m2
+    assert(matrix == expected)
+  }
+  test("Identity matrix multiplication") {
+    val Identity = Matrix(Array(
+      Array(1f , 0f , 0f , 0f ),
+      Array(0f , 1f , 0f , 0f ),
+      Array(0f , 0f , 1f , 0f ),
+      Array(0f , 0f , 0f , 1f ),
+    ))
+    val vec = Matrix(Array(
+      Array(1f),
+      Array(2f),
+      Array(1f),
+      Array(1f),
+    ))
+    val expected = Matrix(Array(
+      Array(1f),
+      Array(2f),
+      Array(1f),
+      Array(1f),
+    ))
+    val matrix = Identity * vec
+    assert(matrix == expected)
+  }
+  test("Transposing a matrix") {
+    val m1 = Matrix(Array(
+      Array(0f , 9f , 3f , 0f ),
+      Array(9f , 8f , 0f , 8f ),
+      Array(1f , 8f , 5f , 3f ),
+      Array(0f , 0f , 5f , 8f ),
+    ))
+    val expected = Matrix(Array(
+      Array(0f , 9f , 1f , 0f ),
+      Array(9f , 8f , 8f , 0f ),
+      Array(3f , 0f , 5f , 5f ),
+      Array(0f , 8f , 3f , 8f ),
+    ))
+    assert(m1.transpose() == expected)
+  }
+  test("Determinant of a 2 x 2 matrix") {
+    val m1 = Matrix(Array(
+      Array(1f , 5f),
+      Array(-3f ,2f),
+    ))
+    assert(m1.determinant() == 17f)
+  }
+  test("Submatrix of a 3x3 matrix is a 2x2 matrix") {
+    val m1 = Matrix(Array(
+      Array( 1, 5,  0),
+      Array(-3, 2,  7),
+      Array( 0, 6, -3),
+    ))
+    val subM1 = Matrix(Array(
+      Array(-3, 2),
+      Array( 0, 6),
+    ))
+
+    assert(m1.submatrix(0, 2) == subM1)
   }
 }
 
