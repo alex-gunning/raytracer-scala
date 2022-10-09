@@ -367,5 +367,52 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
     assert(m1.cofactor(0, 3) == 51)
     assert(m1.determinant() == -4071)
   }
+  test("Test invertible matrix for invertibility") {
+    val m1 = Matrix(Array(
+      Array(6,  4, 4,  4),
+      Array(5,  5, 7,  6),
+      Array(4, -9, 3, -7),
+      Array(9,  1, 7, -6),
+    ))
+
+    assert(m1.determinant() == -2120)
+    assert(m1.isInvertible())
+  }
+  test("Test non-invertible matrix for invertibility") {
+    val m1 = Matrix(Array(
+      Array(-4, 2, -2, -3),
+      Array(9,  6,  2, 6),
+      Array(0, -5,  1, -5),
+      Array(0,  0,  0, 0),
+    ))
+
+    assert(m1.determinant() == 0)
+    assert(!m1.isInvertible())
+  }
+  test("Calculate the inverse of a matrix") {
+    val m1 = Matrix(Array(
+      Array(-5, 2, 6, -8),
+      Array(1, -5, 1, 8),
+      Array(7,  7, -6, -7),
+      Array(1, -3, 7, 4),
+    ))
+
+    val inverse = m1.inverse()
+    val formattedDecimalInverse = Approx.truncateMatrixDecimals(inverse)
+
+    val expected = Matrix(Array(
+      Array(0.21805f, 0.45113f, 0.24060f, -0.04511f),
+      Array(-0.80827f, -1.45677f, -0.44361f, 0.52068f),
+      Array(-0.07895f, -0.22368f, -0.05263f, 0.19737f),
+      Array(-0.52256f, -0.81391f, -0.30075f, 0.30639f),
+    ))
+
+    assert(m1.determinant() == 532)
+    assert(m1.cofactor(2,3) == -160)
+    assert(inverse(3,2) == (-160/532.0).toFloat)
+    assert(m1.cofactor(3,2) == 105)
+    assert(inverse(2,3) == (105/532.0).toFloat)
+    assert(formattedDecimalInverse == expected)
+  }
 }
 

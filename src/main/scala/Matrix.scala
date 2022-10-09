@@ -6,7 +6,7 @@ case class Matrix(data: Array[Array[Float]]) {
 
   def apply(i: Int, j: Int): Float = data(i)(j) // Indexing
 
-  def update(i: Int, j: Int, value: Float) = { // Assignment
+  def update(i: Int, j: Int, value: Float): Matrix = { // Assignment
     data(i)(j) = value
     Matrix(data)
   }
@@ -152,5 +152,20 @@ case class Matrix(data: Array[Array[Float]]) {
   def minor(i: Int, j: Int): Float = submatrix(i, j).determinant()
   def cofactor(i: Int, j: Int): Float = {
     if((i + j) % 2 == 0) minor(i, j) else -minor(i, j)
+  }
+  def isInvertible(): Boolean = determinant() != 0
+
+  def inverse(): Matrix = {
+    // TODO: Fail if not invertible
+    val newMatrix = Matrix(Array.fill(w)(Array.fill(h)(0f)))
+    val det = determinant()
+
+    for(y <- Range.inclusive(0, w - 1)) {
+      for(x <- Range.inclusive(0, h - 1)) {
+        val c = cofactor(x, y)
+        newMatrix(y, x) = c / det
+      }
+    }
+    newMatrix
   }
 }

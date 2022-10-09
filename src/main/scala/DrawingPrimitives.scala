@@ -1,11 +1,19 @@
 import Approx.errorEpsilon
 
-import scala.util.control.Breaks.{break, breakable}
-
 object Approx {
   val errorEpsilon = 0.00001
 
   def clamp(number: Int, min: Int = 0, max: Int = 255) = Math.max(min, Math.min(max, number))
+  def truncateMatrixDecimals(m1: Matrix): Matrix = {
+    val newMatrix = Matrix(Array.fill(m1.w)(Array.fill(m1.h)(0f)))
+    for(y <- Range.inclusive(0, m1.w - 1)) {
+      for(x <- Range.inclusive(0, m1.h - 1)) {
+        val formattedNum = f"${m1(y, x)}%1.5f".replaceAll(",", ".")
+        newMatrix(y, x) = formattedNum.toFloat
+      }
+    }
+    newMatrix
+  }
 }
 
 
