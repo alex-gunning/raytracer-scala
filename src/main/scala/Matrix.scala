@@ -105,7 +105,22 @@ case class Matrix(data: Array[Array[Float]]) {
   }
 
   def determinant(): Float = {
-    data(0)(0) * data(1)(1) - data(0)(1) * data(1)(0)
+    var det = 0f
+    if(w != h) {
+      // Non-square matrices are not invertible.
+      det = 0
+    } else {
+      if (w == 2) {
+        // 2 x 2 Matrix
+        det = data(0)(0) * data(1)(1) - data(0)(1) * data(1)(0)
+      } else {
+        // Larger than 2 x 2
+        for (x <- Range.inclusive(0, w - 1)) {
+          det = det + data(0)(x) * cofactor(0, x)
+        }
+      }
+    }
+    det
   }
 
   def submatrix(r: Int, c: Int): Matrix = {
@@ -132,5 +147,10 @@ case class Matrix(data: Array[Array[Float]]) {
       }
     }
     newMatrixWithoutCol
+  }
+
+  def minor(i: Int, j: Int): Float = submatrix(i, j).determinant()
+  def cofactor(i: Int, j: Int): Float = {
+    if((i + j) % 2 == 0) minor(i, j) else -minor(i, j)
   }
 }
