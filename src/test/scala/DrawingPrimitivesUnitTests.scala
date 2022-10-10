@@ -414,5 +414,24 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
     assert(inverse(2,3) == (105/532.0).toFloat)
     assert(formattedDecimalInverse == expected)
   }
-}
+  test("Calculate the inverse of another matrix") {
+    val A = Matrix(Array(
+      Array( 3, -9,  7,  3),
+      Array( 3, -8,  2, -9),
+      Array(-4,  4,  4,  1),
+      Array(-6,  5, -1,  1),
+    ))
 
+    val B = Matrix(Array(
+      Array(8,  2, 2, 2),
+      Array(3, -1, 7, 0),
+      Array(7,  0, 5, 4),
+      Array(6, -2, 0, 5),
+    ))
+
+    val C = A * B
+    val D = C * B.inverse()
+    val dApprox = Approx.truncateMatrixDecimals(D)
+    assert(A == dApprox)
+  }
+}

@@ -1,5 +1,3 @@
-import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Paths}
 
 case class Projectile(position: Point, velocity: Vector)
 

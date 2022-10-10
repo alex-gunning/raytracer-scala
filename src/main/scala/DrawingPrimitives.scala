@@ -16,7 +16,6 @@ object Approx {
   }
 }
 
-
 case class Colour(r: Float, g: Float, b: Float) {
   def +(other: Colour) = Colour(r + other.r, g + other.g, b + other.b)
 
@@ -70,10 +69,6 @@ case class Canvas(w: Int, h: Int) {
         }
       })
       .reduce((a, b) => a.concat("\n").concat(b))
-
-
-    // Add newline to the end
-    //    colourData = colourData.concat("\n")
 
     s"""|P3
         |$w $h
