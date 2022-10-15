@@ -91,6 +91,20 @@ case class Matrix(data: Array[Array[Float]]) {
       throw new RuntimeException(s"Bad matrix dimensions. ${data.length}x${widthUs} and Vec4")
     }
   }
+  def *(other: Point): Point = {
+    val widthUs = data(0).length
+    val heightThem = 4
+
+    val isMultiplyable = widthUs == heightThem
+    if (isMultiplyable) {
+      val newX = data(0)(0) * other.x + data(0)(1) * other.y + data(0)(2) * other.z + data(0)(3) * other.w
+      val newY = data(1)(0) * other.x + data(1)(1) * other.y + data(1)(2) * other.z + data(1)(3) * other.w
+      val newZ = data(2)(0) * other.x + data(2)(1) * other.y + data(2)(2) * other.z + data(2)(3) * other.w
+      Point(newX, newY, newZ)
+    } else {
+      throw new RuntimeException(s"Bad matrix dimensions. ${data.length}x${widthUs} and Point4")
+    }
+  }
 
   def transpose(): Matrix = {
     val newMatrix = Matrix(
@@ -153,7 +167,7 @@ case class Matrix(data: Array[Array[Float]]) {
   def cofactor(i: Int, j: Int): Float = {
     if((i + j) % 2 == 0) minor(i, j) else -minor(i, j)
   }
-  def isInvertible(): Boolean = determinant() != 0
+  def isInvertible: Boolean = determinant() != 0
 
   def inverse(): Matrix = {
     // TODO: Fail if not invertible

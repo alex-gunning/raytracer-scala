@@ -1,5 +1,8 @@
-import Approx.errorEpsilon
+import Approx.{errorEpsilon, truncateDecimals}
+import Transformations.{rotateX, rotateY, rotateZ, scaling, shearing, translation}
 import org.scalatest.funsuite.AnyFunSuite
+
+import scala.math.{Pi, sqrt}
 
 class DrawingPrimitivesUnitTests extends AnyFunSuite {
   test("A point can be added to a vector to yield another point") {
@@ -376,7 +379,7 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
     ))
 
     assert(m1.determinant() == -2120)
-    assert(m1.isInvertible())
+    assert(m1.isInvertible)
   }
   test("Test non-invertible matrix for invertibility") {
     val m1 = Matrix(Array(
@@ -387,7 +390,7 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
     ))
 
     assert(m1.determinant() == 0)
-    assert(!m1.isInvertible())
+    assert(!m1.isInvertible)
   }
   test("Calculate the inverse of a matrix") {
     val m1 = Matrix(Array(
@@ -433,5 +436,162 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
     val D = C * B.inverse()
     val dApprox = Approx.truncateMatrixDecimals(D)
     assert(A == dApprox)
+  }
+  test("Multiplying by a translation matrix") {
+    val translateMatrix = translation(5, -3, 2)
+    val p = Point(-3, 4, 5)
+
+    val transformed = translateMatrix * p
+    assert(transformed == Point(2, 1, 7))
+  }
+  test("Multiplying by the inverse a translation matrix") {
+    val translateMatrix = translation(5, -3, 2)
+    val p = Point(-3, 4, 5)
+
+    val transformed = translateMatrix.inverse() * p
+    assert(transformed == Point(-8, 7, 3))
+  }
+  test("Translation does not affect vectors") {
+    val translateMatrix = translation(5, -3, 2)
+    val v = Vector(-3, 4, 5)
+
+    val transformed = translateMatrix * v
+    assert(transformed == Vector(-3, 4, 5))
+  }
+  test("A scaling matrix applied to a point") {
+    val scalingMatrix = scaling(2, 3, 4)
+    val v = Point(-4, 6, 8)
+
+    val transformed = scalingMatrix * v
+    assert(transformed == Point(-8, 18, 32))
+  }
+  test("A scaling matrix applied to a vector") {
+    val scalingMatrix = scaling(2, 3, 4).inverse()
+    val v = Vector(-4, 6, 8)
+
+    val transformed = scalingMatrix * v
+    assert(transformed == Vector(-2, 2, 2))
+  }
+  test("Multiplying by the inverse of a scaling matrix") {
+    val scalingMatrix = scaling(2, 3, 4).inverse()
+    val v = Vector(-4, 6, 8)
+
+    val transformed = scalingMatrix * v
+    assert(transformed == Vector(-2, 2, 2))
+  }
+  test("Reflection is scaling by a negative value") {
+    val scalingMatrix = scaling(-1, 1, 1)
+    val p = Point(2,3,4)
+
+    val transformed = scalingMatrix * p
+    assert(transformed == Point(-2, 3, 4))
+  }
+  test("Rotating a point around the x-axis") {
+    val halfQuarterMatrix = rotateX((Math.PI / 4).toFloat)
+    val fullQuarterMatrix = rotateX((Math.PI / 2).toFloat)
+    val p = Point(0,1,0)
+
+    val half = halfQuarterMatrix * p
+    val full = truncateDecimals(fullQuarterMatrix * p)
+
+    assert(half == Point(0, (sqrt(2)/2).toFloat, (sqrt(2)/2).toFloat))
+    assert(full == Point(0, 0, 1))
+  }
+
+  test("The inverse of an x-rotation rotates in the opposite direction") {
+    val halfQuarterMatrix = rotateX((Math.PI / 4).toFloat)
+    val inverse = halfQuarterMatrix.inverse()
+    val p = Point(0,1,0)
+
+    val expected = truncateDecimals(Point(0, (sqrt(2)/2).toFloat, -(sqrt(2)/2).toFloat))
+
+    assert(truncateDecimals(inverse * p) == expected)
+  }
+
+  test("Rotating a point around the y-axis") {
+    val halfQuarterMatrix = rotateY((Math.PI / 4).toFloat)
+    val fullQuarterMatrix = rotateY((Math.PI / 2).toFloat)
+    val p = Point(0,0,1)
+
+    val half = halfQuarterMatrix * p
+    val full = truncateDecimals(fullQuarterMatrix * p)
+
+    assert(half == Point((sqrt(2)/2).toFloat, 0, (sqrt(2)/2).toFloat))
+    assert(full == Point(1, 0, 0))
+  }
+
+  test("Rotating a point around the z-axis") {
+    val halfQuarterMatrix = rotateZ((Math.PI / 4).toFloat)
+    val fullQuarterMatrix = rotateZ((Math.PI / 2).toFloat)
+    val p = Point(0,1,0)
+
+    val half = halfQuarterMatrix * p
+    val full = truncateDecimals(fullQuarterMatrix * p)
+
+    assert(half == Point(-(sqrt(2)/2).toFloat, (sqrt(2)/2).toFloat, 0))
+    assert(full == Point(-1, 0, 0))
+  }
+
+  test("A shearing transformation moves x in proportion to y") {
+    val shearingMatrix = shearing(1,0,0,0,0,0)
+    val p = Point(2,3,4)
+
+    assert(shearingMatrix * p == Point(5, 3, 4))
+  }
+  test("A shearing transformation moves x in proportion to z") {
+    val shearingMatrix = shearing(0,1,0,0,0,0)
+    val p = Point(2,3,4)
+
+    assert(shearingMatrix * p == Point(6, 3, 4))
+  }
+  test("A shearing transformation moves y in proportion to x") {
+    val shearingMatrix = shearing(0,0,1,0,0,0)
+    val p = Point(2,3,4)
+
+    assert(shearingMatrix * p == Point(2,5,4))
+  }
+  test("A shearing transformation moves y in proportion to z") {
+    val shearingMatrix = shearing(0,0,0,1,0,0)
+    val p = Point(2,3,4)
+
+    assert(shearingMatrix * p == Point(2,7,4))
+  }
+  test("A shearing transformation moves z in proportion to x") {
+    val shearingMatrix = shearing(0,0,0,0,1,0)
+    val p = Point(2,3,4)
+
+    assert(shearingMatrix * p == Point(2,3,6))
+  }
+  test("A shearing transformation moves z in proportion to y") {
+    val shearingMatrix = shearing(0,0,0,0,0,1)
+    val p = Point(2,3,4)
+
+    assert(shearingMatrix * p == Point(2,3,7))
+  }
+  test("Individual transformations are applied in sequence") {
+    val p = Point(1,0,1)
+    val rotationMatrix = rotateX((Pi / 2).toFloat)
+    val scalingMatrix = scaling(5, 5, 5)
+    val translationMatrix = translation(10, 5, 7)
+
+    val p2 = truncateDecimals(rotationMatrix * p)
+    val p3 = truncateDecimals(scalingMatrix * p2)
+    val p4 = truncateDecimals(translationMatrix * p3)
+
+    assert(p2 == Point(1, -1, 0))
+    assert(p3 == Point(5, -5, 0))
+    assert(p4 == Point(15, 0, 7))
+  }
+
+  test("Chained transformations must be applied in the reverse order") {
+    val p = Point(1,0,1)
+    val rotationMatrix = rotateX((Pi / 2).toFloat)
+    val scalingMatrix = scaling(5, 5, 5)
+    val translationMatrix = translation(10, 5, 7)
+
+    val transformationMatrix = translationMatrix * scalingMatrix * rotationMatrix
+    val result = transformationMatrix * p
+
+    assert(result == Point(15, 0, 7))
   }
 }

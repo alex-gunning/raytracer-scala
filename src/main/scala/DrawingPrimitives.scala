@@ -14,6 +14,12 @@ object Approx {
     }
     newMatrix
   }
+
+  def truncateDecimals(p: Point): Point = Point(
+    f"${p.x}%1.5f".replaceAll(",", ".").toFloat,
+    f"${p.y}%1.5f".replaceAll(",", ".").toFloat,
+    f"${p.z}%1.5f".replaceAll(",", ".").toFloat
+  )
 }
 
 case class Colour(r: Float, g: Float, b: Float) {
