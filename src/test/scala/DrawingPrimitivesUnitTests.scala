@@ -594,4 +594,66 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
 
     assert(result == Point(15, 0, 7))
   }
+
+  test("Creating and querying a ray") {
+    val origin = Point(1,2,3)
+    val direction = Vector(4,5,6)
+    val ray = Ray(origin, direction)
+
+    assert(ray.origin == origin)
+    assert(ray.direction == direction)
+  }
+
+  test("Computing a point from a distance") {
+    val ray = Ray(Point(2,3,4), Vector(1,0,0))
+
+    assert(ray.position(0) == Point(2,3,4))
+    assert(ray.position(1) == Point(3,3,4))
+    assert(ray.position(-1) == Point(1,3,4))
+    assert(ray.position(2.5f) == Point(4.5f, 3, 4))
+  }
+
+  test("A ray intersects a sphere at two points") {
+    val ray = Ray(Point(0,0,-5), Vector(0,0,1))
+    val sphere = Sphere()
+    val xs = ray.intersect(sphere)
+
+    assert(xs.length == 2)
+    assert(xs(0) == 4)
+    assert(xs(1) == 6)
+  }
+  test("A ray intersects a sphere at a tangent") {
+    val ray = Ray(Point(0,1,-5), Vector(0,0,1))
+    val sphere = Sphere()
+    val xs = ray.intersect(sphere)
+
+    assert(xs.length == 2)
+    assert(xs(0) == 5)
+    assert(xs(1) == 5)
+  }
+  test("A ray misses a sphere") {
+    val ray = Ray(Point(0,2,-5), Vector(0,0,1))
+    val sphere = Sphere()
+    val xs = ray.intersect(sphere)
+
+    assert(xs.length == 0)
+  }
+  test("A ray originates inside a sphere") {
+    val ray = Ray(Point(0,0,0), Vector(0,0,1))
+    val sphere = Sphere()
+    val xs = ray.intersect(sphere)
+
+    assert(xs.length == 2)
+    assert(xs(0) == -1)
+    assert(xs(1) == 1)
+  }
+  test("A sphere is behind a ray") {
+    val ray = Ray(Point(0,0,5), Vector(0,0,1))
+    val sphere = Sphere()
+    val xs = ray.intersect(sphere)
+
+    assert(xs.length == 2)
+    assert(xs(0) == -6)
+    assert(xs(1) == -4)
+  }
 }

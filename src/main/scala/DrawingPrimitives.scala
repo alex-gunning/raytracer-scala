@@ -22,6 +22,10 @@ object Approx {
   )
 }
 
+object ArrayExtensions {
+//  extension Array()
+}
+
 case class Colour(r: Float, g: Float, b: Float) {
   def +(other: Colour) = Colour(r + other.r, g + other.g, b + other.b)
 
