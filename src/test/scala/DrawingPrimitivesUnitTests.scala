@@ -1,4 +1,5 @@
 import Approx.{errorEpsilon, truncateDecimals}
+import Intersect.{Intersection, hit, intersections}
 import Transformations.{rotateX, rotateY, rotateZ, scaling, shearing, translation}
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -619,8 +620,8 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
     val xs = ray.intersect(sphere)
 
     assert(xs.length == 2)
-    assert(xs(0) == 4)
-    assert(xs(1) == 6)
+    assert(xs(0).t == 4)
+    assert(xs(1).t == 6)
   }
   test("A ray intersects a sphere at a tangent") {
     val ray = Ray(Point(0,1,-5), Vector(0,0,1))
@@ -628,8 +629,8 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
     val xs = ray.intersect(sphere)
 
     assert(xs.length == 2)
-    assert(xs(0) == 5)
-    assert(xs(1) == 5)
+    assert(xs(0).t == 5)
+    assert(xs(1).t == 5)
   }
   test("A ray misses a sphere") {
     val ray = Ray(Point(0,2,-5), Vector(0,0,1))
@@ -644,8 +645,8 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
     val xs = ray.intersect(sphere)
 
     assert(xs.length == 2)
-    assert(xs(0) == -1)
-    assert(xs(1) == 1)
+    assert(xs(0).t == -1)
+    assert(xs(1).t == 1)
   }
   test("A sphere is behind a ray") {
     val ray = Ray(Point(0,0,5), Vector(0,0,1))
@@ -653,7 +654,72 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
     val xs = ray.intersect(sphere)
 
     assert(xs.length == 2)
-    assert(xs(0) == -6)
-    assert(xs(1) == -4)
+    assert(xs(0).t == -6)
+    assert(xs(1).t == -4)
+  }
+  test("An intersection encapsulates t and object") {
+    val sphere = Sphere()
+    val i = Intersection(3.5f, sphere)
+
+    assert(i.t == 3.5)
+    assert(i.obj == sphere)
+  }
+  test("Aggregating intersections") {
+    val sphere = Sphere()
+    val i1 = Intersection(1, sphere)
+    val i2 = Intersection(2, sphere)
+
+    val xs = intersections(i1, i2)
+
+    assert(xs.length == 2)
+    assert(xs(0).obj == sphere)
+    assert(xs(1).obj == sphere)
+  }
+  test("Intersect sets the object on the intersection") {
+    val r = Ray(Point(0,0,-5), Vector(0,0,1))
+    val s = Sphere()
+    val xs = r.intersect(s)
+
+    assert(xs.length == 2)
+    assert(xs(0).obj == s)
+    assert(xs(1).obj == s)
+  }
+  test("The hit, when all intersections have a positive t") {
+    val s = Sphere()
+    val i1 = Intersection(1, s)
+    val i2 = Intersection(2, s)
+    val xs = intersections(i2, i1)
+
+    val i = hit(xs)
+    assert(i(0) == i1)
+  }
+  test("The hit, when some intersections have a negative t") {
+    val s = Sphere()
+    val i1 = Intersection(-1, s)
+    val i2 = Intersection(1, s)
+    val xs = intersections(i2, i1)
+
+    val i = hit(xs)
+    assert(i(0) == i2)
+  }
+  test("The hit, when all intersections have a negative t") {
+    val s = Sphere()
+    val i1 = Intersection(-2, s)
+    val i2 = Intersection(-1, s)
+    val xs = intersections(i2, i1)
+
+    val i = hit(xs)
+    assert(i.length == 0)
+  }
+  test("The hit is always the lowest nonnegative intersection") {
+    val s = Sphere()
+    val i1 = Intersection(5, s)
+    val i2 = Intersection(7, s)
+    val i3 = Intersection(-3, s)
+    val i4 = Intersection(2, s)
+    val xs = intersections(i1, i2, i3, i4)
+
+    val i = hit(xs)
+    assert(i(0) == i4)
   }
 }

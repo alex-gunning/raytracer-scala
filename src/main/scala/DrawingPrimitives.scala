@@ -22,10 +22,6 @@ object Approx {
   )
 }
 
-object ArrayExtensions {
-//  extension Array()
-}
-
 case class Colour(r: Float, g: Float, b: Float) {
   def +(other: Colour) = Colour(r + other.r, g + other.g, b + other.b)
 
@@ -85,5 +81,15 @@ case class Canvas(w: Int, h: Int) {
         |255
         |${colourData}
         |""".stripMargin
+  }
+}
+
+object Intersect {
+  case class Intersection(t: Float, obj: Sphere)
+
+  def intersections(intersections: Intersection*): Array[Intersection] = intersections.toArray.sortWith((a,b) => a.t < b.t)
+  def hit(intersections: Array[Intersection]): Array[Intersection] = {
+    val a = intersections.filterNot(_.t < 0)
+    if(a.length > 0) Array(a.head) else Array.empty
   }
 }
