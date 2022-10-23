@@ -86,10 +86,16 @@ case class Canvas(w: Int, h: Int) {
 
 object Intersect {
   case class Intersection(t: Float, obj: Sphere)
-
   def intersections(intersections: Intersection*): Array[Intersection] = intersections.toArray.sortWith((a,b) => a.t < b.t)
   def hit(intersections: Array[Intersection]): Array[Intersection] = {
     val a = intersections.filterNot(_.t < 0)
     if(a.length > 0) Array(a.head) else Array.empty
   }
+
+  def transform(ray: Ray, matrix: Matrix): Ray = {
+    val newOrigin = matrix * ray.origin
+    val newDirection = matrix * ray.direction
+    Ray(newOrigin, newDirection)
+  }
+
 }

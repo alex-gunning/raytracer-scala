@@ -1,11 +1,13 @@
 import scala.util.control.Breaks.{break, breakable}
 
-class Identity() extends Matrix(Array(
-  Array(1,0,0,0),
-  Array(0,1,0,0),
-  Array(0,0,1,0),
-  Array(0,0,0,1),
-))
+object MatrixConstants {
+  def Identity(): Matrix = Matrix(Array(
+    Array(1, 0, 0, 0),
+    Array(0, 1, 0, 0),
+    Array(0, 0, 1, 0),
+    Array(0, 0, 0, 1),
+  ))
+}
 case class Matrix(data: Array[Array[Float]]) {
   val w: Int = data(0).length
   val h: Int = data.length

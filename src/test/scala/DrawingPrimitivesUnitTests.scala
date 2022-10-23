@@ -1,5 +1,6 @@
 import Approx.{errorEpsilon, truncateDecimals}
-import Intersect.{Intersection, hit, intersections}
+import Intersect.{Intersection, hit, intersections, transform}
+import MatrixConstants.Identity
 import Transformations.{rotateX, rotateY, rotateZ, scaling, shearing, translation}
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -721,5 +722,50 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
 
     val i = hit(xs)
     assert(i(0) == i4)
+  }
+  test("Translating a ray") {
+    val r = Ray(Point(1,2,3), Vector(0,1,0))
+    val m = translation(3,4,5)
+    val r2 = transform(r, m)
+
+    assert(r2.origin == Point(4,6,8))
+    assert(r2.direction == Vector(0,1,0))
+  }
+  test("Scaling a ray") {
+    val r = Ray(Point(1,2,3), Vector(0,1,0))
+    val m = scaling(2,3,4)
+    val r2 = transform(r, m)
+
+    assert(r2.origin == Point(2,6,12))
+    assert(r2.direction == Vector(0,3,0))
+  }
+  test("A sphere's default transformation") {
+    val s = Sphere()
+    assert(s.transform == Identity())
+  }
+  test("Changing a sphere's transformation") {
+    val s = Sphere()
+    val t = translation(2,3,4)
+    s.setTransform(t)
+
+    assert(s.transform == t)
+  }
+  test("Intersecting a scaled sphere with a ray") {
+    val r = Ray(Point(0,0,-5), Vector(0,0,1))
+    val s = Sphere()
+    s.setTransform(scaling(2,2,2))
+    val xs = r.intersect(s)
+
+    assert(xs.length == 2)
+    assert(xs(0).t == 3)
+    assert(xs(1).t == 7)
+  }
+  test("Intersection a translated sphere with a ray") {
+    val r = Ray(Point(0,0,-5), Vector(0,0,1))
+    val s = Sphere()
+    s.setTransform(translation(5,0,0))
+    val xs = r.intersect(s)
+
+    assert(xs.length == 0)
   }
 }

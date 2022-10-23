@@ -7,9 +7,12 @@ case class Ray(origin: Point, direction: Vector) {
 
   // Object intersections
   def intersect(sphere: Sphere): Array[RayIntersection] = {
-    val sphereToRay = origin - sphere.origin
-    val a = direction.dot(direction)
-    val b = 2 * direction.dot(sphereToRay)
+    // Transform object coords to world coords.
+    val worldCoordsRay = Intersect.transform(Ray(origin, direction), sphere.transform.inverse())
+
+    val sphereToRay = worldCoordsRay.origin - sphere.origin
+    val a = worldCoordsRay.direction.dot(worldCoordsRay.direction)
+    val b = 2 * worldCoordsRay.direction.dot(sphereToRay)
     val c = sphereToRay.dot(sphereToRay) - 1
 
     val discriminant = pow(b, 2) - 4 * a * c
