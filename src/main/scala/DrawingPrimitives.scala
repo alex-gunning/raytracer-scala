@@ -20,6 +20,11 @@ object Approx {
     f"${p.y}%1.5f".replaceAll(",", ".").toFloat,
     f"${p.z}%1.5f".replaceAll(",", ".").toFloat
   )
+  def truncateDecimals(v: Vector): Vector = Vector(
+    f"${v.x}%1.5f".replaceAll(",", ".").toFloat,
+    f"${v.y}%1.5f".replaceAll(",", ".").toFloat,
+    f"${v.z}%1.5f".replaceAll(",", ".").toFloat
+  )
 }
 
 case class Colour(r: Float, g: Float, b: Float) {

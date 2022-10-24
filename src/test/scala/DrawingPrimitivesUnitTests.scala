@@ -1,4 +1,4 @@
-import Approx.{errorEpsilon, truncateDecimals}
+import Approx.{errorEpsilon, truncateDecimals, truncateMatrixDecimals}
 import Intersect.{hit, intersections, transform}
 import MatrixConstants.Identity
 import Transformations.{rotateX, rotateY, rotateZ, scaling, shearing, translation}
@@ -767,5 +767,61 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
     val xs = r.intersect(s)
 
     assert(xs.length == 0)
+  }
+  test("A normal on a sphere at a point on the x-axis") {
+    val s = Sphere()
+    val n = s.normalAt(Point(1,0,0))
+
+    assert(n == Vector(1,0,0))
+  }
+  test("A normal on a sphere at a point on the y-axis") {
+    val s = Sphere()
+    val n = s.normalAt(Point(0,1,0))
+
+    assert(n == Vector(0,1,0))
+  }
+  test("A normal on a sphere at a point on the z-axis") {
+    val s = Sphere()
+    val n = s.normalAt(Point(0,0,1))
+
+    assert(n == Vector(0,0,1))
+  }
+  test("The normal on a sphere at a nonaxial point") {
+    val s = Sphere()
+    val n = s.normalAt(Point((sqrt(3)/3).toFloat,(sqrt(3)/3).toFloat,(sqrt(3)/3).toFloat))
+
+    assert(n == Vector((sqrt(3)/3).toFloat,(sqrt(3)/3).toFloat,(sqrt(3)/3).toFloat))
+  }
+  test("A normal is a normalized vector") {
+    val s = Sphere()
+    val n = s.normalAt(Point((sqrt(3)/3).toFloat,(sqrt(3)/3).toFloat,(sqrt(3)/3).toFloat))
+
+    assert(n == n.normalized())
+  }
+  test("Computing the normal on a translated sphere") {
+    val s = Sphere()
+    s.setTransform(translation(0, 1, 0))
+    val n = s.normalAt(Point(0, 1.70711f, -0.70711f))
+
+    assert(truncateDecimals(n) == Vector(0, 0.70711f, -0.70711f))
+  }
+  test("Computing the normal on a transformed sphere") {
+    val s = Sphere()
+    s.setTransform(scaling(1, 0.5f, 1) * rotateZ((Pi / 5).toFloat))
+    val n = s.normalAt(Point(0,(sqrt(2)/2).toFloat,(-sqrt(2)/2).toFloat))
+
+    assert(truncateDecimals(n) == Vector(0,0.97014f,-0.24254f))
+  }
+  test("Reflecting a vector approaching at 45 degrees") {
+    val v = Vector(1,-1,0)
+    val n = Vector(0,1,0)
+    val r = v.reflect(n)
+    assert(r == Vector(1,1,0))
+  }
+  test("Reflecting a vector off a slanted surface") {
+    val v = Vector(0,-1,0)
+    val n = Vector((sqrt(2)/2).toFloat,(sqrt(2)/2).toFloat,0)
+    val r = v.reflect(n)
+    assert(truncateDecimals(r) == Vector(1,0,0))
   }
 }

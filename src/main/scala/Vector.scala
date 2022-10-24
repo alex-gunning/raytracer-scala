@@ -1,4 +1,4 @@
-case class Vector(x: Float, y: Float, z: Float, w: Int = 0) {
+case class Vector(x: Float, y: Float, z: Float, var w: Int = 0) {
   def +(other: Vector) = Vector(x + other.x, y + other.y, z + other.z, w + other.w)
 
   def -(other: Vector) = Vector(x - other.x, y - other.y, z - other.z, w - other.w)
@@ -27,4 +27,6 @@ case class Vector(x: Float, y: Float, z: Float, w: Int = 0) {
     z * o.x - x * o.z,
     x * o.y - y * o.x
   )
+
+  def reflect(n: Vector) = this - n * 2 * this.dot(n)
 }
