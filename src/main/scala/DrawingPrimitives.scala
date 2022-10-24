@@ -85,9 +85,8 @@ case class Canvas(w: Int, h: Int) {
 }
 
 object Intersect {
-  case class Intersection(t: Float, obj: Sphere)
-  def intersections(intersections: Intersection*): Array[Intersection] = intersections.toArray.sortWith((a,b) => a.t < b.t)
-  def hit(intersections: Array[Intersection]): Array[Intersection] = {
+  def intersections(intersections: RayIntersection*): Array[RayIntersection] = intersections.toArray.sortWith((a,b) => a.t < b.t)
+  def hit(intersections: Array[RayIntersection]): Array[RayIntersection] = {
     val a = intersections.filterNot(_.t < 0)
     if(a.length > 0) Array(a.head) else Array.empty
   }

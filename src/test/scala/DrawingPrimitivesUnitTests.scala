@@ -1,5 +1,5 @@
 import Approx.{errorEpsilon, truncateDecimals}
-import Intersect.{Intersection, hit, intersections, transform}
+import Intersect.{hit, intersections, transform}
 import MatrixConstants.Identity
 import Transformations.{rotateX, rotateY, rotateZ, scaling, shearing, translation}
 import org.scalatest.funsuite.AnyFunSuite
@@ -660,15 +660,15 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
   }
   test("An intersection encapsulates t and object") {
     val sphere = Sphere()
-    val i = Intersection(3.5f, sphere)
+    val i = RayIntersection(3.5f, sphere)
 
     assert(i.t == 3.5)
     assert(i.obj == sphere)
   }
   test("Aggregating intersections") {
     val sphere = Sphere()
-    val i1 = Intersection(1, sphere)
-    val i2 = Intersection(2, sphere)
+    val i1 = RayIntersection(1, sphere)
+    val i2 = RayIntersection(2, sphere)
 
     val xs = intersections(i1, i2)
 
@@ -687,8 +687,8 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
   }
   test("The hit, when all intersections have a positive t") {
     val s = Sphere()
-    val i1 = Intersection(1, s)
-    val i2 = Intersection(2, s)
+    val i1 = RayIntersection(1, s)
+    val i2 = RayIntersection(2, s)
     val xs = intersections(i2, i1)
 
     val i = hit(xs)
@@ -696,8 +696,8 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
   }
   test("The hit, when some intersections have a negative t") {
     val s = Sphere()
-    val i1 = Intersection(-1, s)
-    val i2 = Intersection(1, s)
+    val i1 = RayIntersection(-1, s)
+    val i2 = RayIntersection(1, s)
     val xs = intersections(i2, i1)
 
     val i = hit(xs)
@@ -705,8 +705,8 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
   }
   test("The hit, when all intersections have a negative t") {
     val s = Sphere()
-    val i1 = Intersection(-2, s)
-    val i2 = Intersection(-1, s)
+    val i1 = RayIntersection(-2, s)
+    val i2 = RayIntersection(-1, s)
     val xs = intersections(i2, i1)
 
     val i = hit(xs)
@@ -714,10 +714,10 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
   }
   test("The hit is always the lowest nonnegative intersection") {
     val s = Sphere()
-    val i1 = Intersection(5, s)
-    val i2 = Intersection(7, s)
-    val i3 = Intersection(-3, s)
-    val i4 = Intersection(2, s)
+    val i1 = RayIntersection(5, s)
+    val i2 = RayIntersection(7, s)
+    val i3 = RayIntersection(-3, s)
+    val i4 = RayIntersection(2, s)
     val xs = intersections(i1, i2, i3, i4)
 
     val i = hit(xs)

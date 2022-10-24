@@ -2,20 +2,49 @@
 case class Projectile(position: Point, velocity: Vector)
 
 case class Environment(gravity: Vector, wind: Vector)
-import Transformations.{rotateY, scaling, translation}
+import Intersect.hit
+import Transformations.{rotateY, rotateZ, scaling, shearing, translation}
 
 import java.io.PrintWriter
 
 object Main {
-  val c = Canvas(500, 500)
+  val canvasPixels = 500
+  val c = Canvas(canvasPixels, canvasPixels)
 
   def main(args: Array[String]): Unit = {
-    println("Clock")
+    println("SphereSilhouette")
 
 //    cannonTick(Projectile(Point(0, 1, 0), Vector(1, 1.8f, 0).normalized() * 11.25f), Environment(Vector(0, -0.1f, 0), Vector(-0.01f, 0, 0)))
-    clock()
-    new PrintWriter("image.ppm") { write(c.serialize); close }
+//    clock()
+    sphereSilloette()
+    new PrintWriter("SphereSilhouette.ppm") { write(c.serialize); close }
     println("Completed")
+  }
+
+  def sphereSilloette(): Unit = {
+    val rayOrigin = Point(0,0,-5)
+    val wallZ = 10f
+    val wallSize = 7f
+    val pixelSize = wallSize / canvasPixels
+    val half = wallSize / 2f
+    val shape = Sphere()
+    shape.setTransform(shearing(1,0,0,0,0,0) * scaling(0.5f, 1, 1))
+
+    for(y <- Range.inclusive(0, canvasPixels - 1)) {
+      val worldY = half - pixelSize * y
+      for(x <- Range.inclusive(0, canvasPixels - 1)) {
+        val worldX = -half + pixelSize * x
+        val position = Point(worldX, worldY, wallZ)
+
+        val normalizedPosition = position - rayOrigin
+        val r = Ray(rayOrigin, Vector(normalizedPosition.x, normalizedPosition.y, normalizedPosition.z).normalized())
+        val xs = r.intersect(shape)
+
+        if(hit(xs).length > 0) {
+          c.writePixel(x, y, Colour(1,0,0))
+        }
+      }
+    }
   }
 
   def clock(): Unit = {
