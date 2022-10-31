@@ -1,5 +1,6 @@
 import Approx.{errorEpsilon, truncateDecimals, truncateMatrixDecimals}
 import Intersect.{hit, intersections, transform}
+import Lighting.PointLight
 import MatrixConstants.Identity
 import Transformations.{rotateX, rotateY, rotateZ, scaling, shearing, translation}
 import org.scalatest.funsuite.AnyFunSuite
@@ -823,5 +824,30 @@ class DrawingPrimitivesUnitTests extends AnyFunSuite {
     val n = Vector((sqrt(2)/2).toFloat,(sqrt(2)/2).toFloat,0)
     val r = v.reflect(n)
     assert(truncateDecimals(r) == Vector(1,0,0))
+  }
+  test("A point light has a position and intensity") {
+    val intensity = Colour(1,1,1)
+    val position = Point(0,0,0)
+    val light = PointLight(position, intensity)
+    assert(light.position == position)
+    assert(light.intensity == intensity)
+  }
+  test("The default material") {
+    val m = Material()
+    assert(m.colour == Colour(1,1,1))
+    assert(m.ambient == 0.1f)
+    assert(m.diffuse == 0.9f)
+    assert(m.specular == 0.9f)
+    assert(m.shininess == 200f)
+  }
+  test("A sphere has a default material") {
+    val s = Sphere()
+    assert(s.material == Material())
+  }
+  test("A sphere may be assigned a material") {
+    val s = Sphere()
+    val m = Material(ambient = 1f)
+    s.setMaterial(m)
+    assert(s.material == m)
   }
 }
