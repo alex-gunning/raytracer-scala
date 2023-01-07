@@ -3,6 +3,7 @@ case class Projectile(position: Point, velocity: Vector)
 
 case class Environment(gravity: Vector, wind: Vector)
 import Intersect.hit
+import Lighting.{PointLight, lighting}
 import Transformations.{rotateY, rotateZ, scaling, shearing, translation}
 
 import java.io.PrintWriter
@@ -28,7 +29,9 @@ object Main {
     val pixelSize = wallSize / canvasPixels
     val half = wallSize / 2f
     val shape = Sphere()
-    shape.setTransform(shearing(1,0,0,0,0,0) * scaling(0.5f, 1, 1))
+//    shape.setTransform(shearing(1,0,0,0,0,0) * scaling(0.5f, 1, 1))
+    shape.material = Material(Colour(1f,0.2f,1f))
+    val light = PointLight(Point(-10, 10, -10), Colour(1, 1, 1))
 
     for(y <- Range.inclusive(0, canvasPixels - 1)) {
       val worldY = half - pixelSize * y
@@ -37,11 +40,18 @@ object Main {
         val position = Point(worldX, worldY, wallZ)
 
         val normalizedPosition = position - rayOrigin
-        val r = Ray(rayOrigin, Vector(normalizedPosition.x, normalizedPosition.y, normalizedPosition.z).normalized())
-        val xs = r.intersect(shape)
+        val ray = Ray(rayOrigin, Vector(normalizedPosition.x, normalizedPosition.y, normalizedPosition.z).normalized())
+        val xs = ray.intersect(shape)
 
-        if(hit(xs).length > 0) {
-          c.writePixel(x, y, Colour(1,0,0))
+        val h = hit(xs)
+        if(h.length > 0) {
+          val hit = h(0)
+          val point = ray.position(hit.t)
+          val normal = hit.obj.normalAt(point)
+          val eye = -ray.direction
+          val colour = lighting(hit.obj.material, light, point, eye, normal)
+
+          c.writePixel(x, y, colour)
         }
       }
     }

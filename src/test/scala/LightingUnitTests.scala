@@ -32,7 +32,7 @@ class LightingUnitTests extends AnyFunSuite {
     val normalv = Vector(0,0,-1)
     val light = PointLight(Point(0,10,-10), Colour(1,1,1))
     val result = lighting(m, light, position, eyev, normalv)
-    assert(Approx.truncateDecimals(result) == Colour(1.63639f,1.63639f,1.6363f))
+    assert(Approx.truncateDecimals(result) == Colour(1.63639f,1.63639f,1.63639f))
   }
   test("Lighting with the eye behind the surface") {
     val m = Material()
